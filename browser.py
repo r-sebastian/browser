@@ -1,19 +1,24 @@
-url = "http://example.org/index.html"
+import socket
+import ssl
 
 def request(url):
-    
-    #Checking if your URL contains http
-    assert url.startswith("http://")
-    #strip url to only contain address
-    url = url[len("http://"):]
+
+    #Checking if your URL contains http or https
+    scheme, url = url.split("://", 1)
+    assert scheme in ["http", "https"], "Unknown scheme {}".format(scheme)
 
     #Spliting the URL to the path(/index.html) and host(example.org)
     host , path = url.split("/",1)
     #need this
     path = "/" + path
 
-    #connect to host
-    import socket
+    #support for custom port http://example.org:8080/index.html
+    if ":" in host:
+        host, port = host.split(":", 1)
+        port = int(port)
+
+    #assigning the correct port
+    port = 80 if scheme == "http" else 443
 
     s=socket.socket(
         family=socket.AF_INET,          #address family:tells us how to connect
@@ -21,8 +26,13 @@ def request(url):
         proto=socket.IPPROTO_TCP        #steps to establish a connection
     )
 
+    #TLS
+    if scheme == "https":
+        ctx = ssl.create_default_context()
+        s = ctx.wrap_socket(s, server_hostname=host)
+
     #connect to the host at post 80,connect takes a single argument, and that argument is a pair of a host and a port.
-    s.connect((host , 80))
+    s.connect((host , port))
 
     '''
     request a response to the website
@@ -63,5 +73,22 @@ def request(url):
 
     body = response.read()
     s.close()
-
     return headers, body
+
+def show(body):
+    in_angle = False
+    for c in body:
+        if c == "<":
+            in_angle = True
+        elif c == ">":
+            in_angle = False
+        elif not in_angle:
+            print(c, end="")
+
+def load(url):
+    headers, body = request(url)
+    show(body)
+
+if __name__ == "__main__":
+    import sys
+    load(sys.argv[1])
