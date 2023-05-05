@@ -12,10 +12,10 @@ def request(url):
     else:
         #Checking if your URL contains http or https
         scheme, url = url.split("://", 1)
-        if ":" in scheme:
+        '''if ":" in scheme:
             source_view , scheme = scheme.split(":",1)
-            print(source_view,end="")
-            print(scheme)
+            if source_view == "view-source":
+            '''
         assert scheme in ["http", "https", "file"], "Unknown scheme {}".format(scheme)
 
         #file:/// support
