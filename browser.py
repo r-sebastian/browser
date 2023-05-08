@@ -102,6 +102,7 @@ def request(url):
 
 def show(body):
     tag=''
+    entity = ''
     #entity_check=''
     in_angle = False
     in_body = False
@@ -126,6 +127,11 @@ def show(body):
                 elif c == '>':
                     in_angle = False
                 elif not in_angle:
+                    if c == "&":
+                        '''
+                        NOPEEEEEEEEEEEEEEEEEEEEEE
+                        entity += c
+                        continue'''
                     print(c,end="")
 
 def load(url):
