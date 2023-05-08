@@ -21,7 +21,6 @@ def request(url):
         #file:/// support
         if scheme == "file":
             location = url[1:]
-            print(location)
             response = open(r"{}".format(location),"r")
             body = response.read()
             response.close()
