@@ -12,10 +12,6 @@ def request(url):
     else:
         #Checking if your URL contains http or https
         scheme, url = url.split("://", 1)
-        '''if ":" in scheme:
-            source_view , scheme = scheme.split(":",1)
-            if source_view == "view-source":
-            '''
         assert scheme in ["http", "https", "file"], "Unknown scheme {}".format(scheme)
 
         #file:/// support
@@ -101,8 +97,6 @@ def request(url):
 
 def show(body):
     tag=''
-    entity = ''
-    #entity_check=''
     in_angle = False
     in_body = False
     for c in body:
@@ -114,11 +108,7 @@ def show(body):
                         in_body = True
                     elif tag == "</body>":
                         in_body = False
-                    #elif tag == "&lt;":
-                        #print("<",end="")
-                    #reset tag if and cmplete tag is found eg <head>
                     tag=""
-                    continue
             #print the text between body
             if in_body:
                 if c == '<':
@@ -126,11 +116,6 @@ def show(body):
                 elif c == '>':
                     in_angle = False
                 elif not in_angle:
-                    if c == "&":
-                        '''
-                        NOPEEEEEEEEEEEEEEEEEEEEEE
-                        entity += c
-                        continue'''
                     print(c,end="")
 
 def load(url):
