@@ -1,5 +1,6 @@
 import socket
 import ssl
+import html
 
 def request(url):
 
@@ -97,6 +98,7 @@ def request(url):
 
 def show(body):
     tag=''
+    text = ''
     in_angle = False
     in_body = False
     for c in body:
@@ -116,7 +118,9 @@ def show(body):
                 elif c == '>':
                     in_angle = False
                 elif not in_angle:
-                    print(c,end="")
+                    text += c
+    text = html.unescape(text)
+    print(text)
 
 def load(url):
     headers, body = request(url)
