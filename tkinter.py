@@ -1,6 +1,7 @@
 import tkinter
-from browser import request
+from browser import request #use HTTP connection if certificate error is shown
 WIDTH , HEIGHT = 800 ,600   #resolution of the canvas
+HSTEP, VSTEP = 13, 18   #poniters to dispaly where the next charater is printed
 
 def lex(body):
     text = ""
@@ -32,8 +33,17 @@ class Browser:
         # load data
         headers, body = request(url)
         text = lex(body)
+        cursor_x, cursor_y = HSTEP, VSTEP
+        #draw the text char by char
         for c in text:
-            self.canvas.create_text(100, 100, text=c)   #draw the text char by char
+            self.canvas.create_text(cursor_x, cursor_y, text=c)
+            #prinitng earch line
+            cursor_x += HSTEP
+            #if cursor reaches the end wrap to next line
+            if cursor_x >= WIDTH - HSTEP:
+                cursor_y += VSTEP   #increases the vertical step
+                cursor_x = HSTEP    #resets the hori step
+            #thus priting each line
 
 if __name__ == "__main__":
     import sys
