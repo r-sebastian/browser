@@ -15,6 +15,21 @@ def lex(body):
             text += c
     return text #returns the content of the page without tags
 
+def layout(text):
+        #list for each char dispaly
+        display_list = []   #list of things to display
+        cursor_x, cursor_y = HSTEP, VSTEP
+        for c in text:
+            #list with rendering location and charater
+            display_list.append((cursor_x, cursor_y, c))
+            #prinitng earch line
+            cursor_x += HSTEP
+            #if cursor reaches the end wrap to next line
+            if cursor_x >= WIDTH - HSTEP:
+                cursor_y += VSTEP   #increases the vertical step
+                cursor_x = HSTEP    #resets the hori step
+            #thus priting each line
+        return display_list
 
 class Browser:
     def __init__(self):
@@ -28,22 +43,22 @@ class Browser:
         )
         #pack the canvas to fit tk
         self.canvas.pack()
-
+        #var to store how far user have scrolled
+        self.scroll = 0
+    
     def load(self, url):
-        # load data
         headers, body = request(url)
         text = lex(body)
-        cursor_x, cursor_y = HSTEP, VSTEP
-        #draw the text char by char
-        for c in text:
-            self.canvas.create_text(cursor_x, cursor_y, text=c)
-            #prinitng earch line
-            cursor_x += HSTEP
-            #if cursor reaches the end wrap to next line
-            if cursor_x >= WIDTH - HSTEP:
-                cursor_y += VSTEP   #increases the vertical step
-                cursor_x = HSTEP    #resets the hori step
-            #thus priting each line
+        self.display_list = layout(text)
+        #self.display_list.sort()
+        self.draw()
+    
+    def draw(self):
+        #loops thorugh diaply list
+        for x, y, c in self.display_list:
+            #dispalying each char in list with correct positions
+            #scroll value can now scroll the page as;y  is page coordinate therefore y-scroll is the screen coord
+            self.canvas.create_text(x, y - self.scroll , text=c)
 
 if __name__ == "__main__":
     import sys
