@@ -2,6 +2,7 @@ import tkinter
 from browser import request #use HTTP connection if certificate error is shown
 WIDTH , HEIGHT = 800 ,600   #resolution of the canvas
 HSTEP, VSTEP = 13, 18   #poniters to dispaly where the next charater is printed
+SCROLL_STEP = 100
 
 def lex(body):
     text = ""
@@ -29,6 +30,10 @@ def layout(text):
                 cursor_y += VSTEP   #increases the vertical step
                 cursor_x = HSTEP    #resets the hori step
             #thus priting each line
+        #sorting the list might help
+        '''
+        display_list.sort()
+        '''
         return display_list
 
 class Browser:
@@ -45,20 +50,30 @@ class Browser:
         self.canvas.pack()
         #var to store how far user have scrolled
         self.scroll = 0
+        
+        #SCROLL
+        #option to scroll down using the down arrow key
+        self.window.bind("<Down>", self.scrolldown) #scrolldown is a event handler tk() calles when down is pressed
     
     def load(self, url):
         headers, body = request(url)
         text = lex(body)
         self.display_list = layout(text)
-        #self.display_list.sort()
+        self.display_list.sort()    #NOT NEEDED;used here for smoother scrolling
         self.draw()
     
     def draw(self):
+        self.canvas.delete("all")   #delets all the text everytime we call dra()-->for scrolling
         #loops thorugh diaply list
         for x, y, c in self.display_list:
             #dispalying each char in list with correct positions
             #scroll value can now scroll the page as;y  is page coordinate therefore y-scroll is the screen coord
             self.canvas.create_text(x, y - self.scroll , text=c)
+
+    #incremetns y and redraws the canvas
+    def scrolldown(self, e):
+        self.scroll += SCROLL_STEP  #increase y
+        self.draw()                 #update canvas
 
 if __name__ == "__main__":
     import sys
