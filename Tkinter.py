@@ -65,10 +65,20 @@ class Browser:
     def draw(self):
         self.canvas.delete("all")   #delets all the text everytime we call dra()-->for scrolling
         #loops thorugh diaply list
-        for x, y, c in self.display_list:
+        for x, y, c in self.display_list:\
+            #bewlo 2 if are used to make scrolling faster
+            #we only render stuff in our view
+            if y > self.scroll + HEIGHT: 
+                continue
+            if y + VSTEP < self.scroll: #computes the bottom edge of the character, so that characters that are halfway inside the viewing window are still drawn
+                continue
             #dispalying each char in list with correct positions
             #scroll value can now scroll the page as;y  is page coordinate therefore y-scroll is the screen coord
             self.canvas.create_text(x, y - self.scroll , text=c)
+            '''
+            loading information about the shape of a character, inside create_text, takes a while
+            therefore slow scrolling
+            '''
 
     #incremetns y and redraws the canvas
     def scrolldown(self, e):
