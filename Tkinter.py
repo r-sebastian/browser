@@ -1,4 +1,5 @@
 import tkinter
+import tkinter.font
 from browser import request #use HTTP connection if certificate error is shown
 WIDTH , HEIGHT = 800 ,600   #resolution of the canvas
 HSTEP, VSTEP = 13, 18   #poniters to dispaly where the next charater is printed
@@ -21,14 +22,17 @@ def layout(text):
         display_list = []   #list of things to display
         cursor_x, cursor_y = HSTEP, VSTEP
         for word in text.split():
-            w = font.measure(word)  //measure width
-            if cursor_x + w > WIDTH - HSTEP:
+            w = font.measure(word)  #measure width
+            if cursor_x + w > WIDTH - HSTEP:    #check is right end of word is past the page edge
                 cursor_y += font.metrics("linespace") * 1.25
                 cursor_x = HSTEP
-            self.display_list.append((cursor_x, cursor_y, word))
-            cursor_x += w + font.measure(" ")
+            self.display_list.append((cursor_x, cursor_y, word))  #drawing the word      
+            cursor_x += w + font.measure(" ")   #update the cursor to point to the end of the word
         '''
-        display_list.sort()
+        icrement cursor_x by w + font.measure(" ") instead of w
+        thats because I want to have spaces between the words
+        the call to split() removed all of the whitespace
+        and this adds it back
         '''
         return display_list
 
