@@ -20,17 +20,13 @@ def layout(text):
         #list for each char dispaly
         display_list = []   #list of things to display
         cursor_x, cursor_y = HSTEP, VSTEP
-        for c in text:
-            #list with rendering location and charater
-            display_list.append((cursor_x, cursor_y, c))
-            #prinitng earch line
-            cursor_x += HSTEP
-            #if cursor reaches the end wrap to next line
-            if cursor_x >= WIDTH - HSTEP:
-                cursor_y += VSTEP   #increases the vertical step
-                cursor_x = HSTEP    #resets the hori step
-            #thus priting each line
-        #sorting the list might help
+        for word in text.split():
+            w = font.measure(word)  //measure width
+            if cursor_x + w > WIDTH - HSTEP:
+                cursor_y += font.metrics("linespace") * 1.25
+                cursor_x = HSTEP
+            self.display_list.append((cursor_x, cursor_y, word))
+            cursor_x += w + font.measure(" ")
         '''
         display_list.sort()
         '''
@@ -54,7 +50,15 @@ class Browser:
         #SCROLL
         #option to scroll down using the down arrow key
         self.window.bind("<Down>", self.scrolldown) #scrolldown is a event handler tk() calles when down is pressed
-    
+
+        #setting up font
+        bi_times = tkinter.font.Font(
+            family="Times",
+            size=16,
+            weight="bold",
+            slant="italic",
+        )
+
     def load(self, url):
         headers, body = request(url)
         text = lex(body)
@@ -74,7 +78,7 @@ class Browser:
                 continue
             #dispalying each char in list with correct positions
             #scroll value can now scroll the page as;y  is page coordinate therefore y-scroll is the screen coord
-            self.canvas.create_text(x, y - self.scroll , text=c)
+            self.canvas.create_text(x, y - self.scroll , text=c, font = bi_times, anchor = 'nw')
             '''
             loading information about the shape of a character, inside create_text, takes a while
             therefore slow scrolling
