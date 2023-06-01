@@ -54,10 +54,18 @@ class Layout:
                 weight = "bold"
             elif tok.tag == "/b":
                 weight = "normal"
-
+            elif tok.tag == "small":
+                self.size -= 2
+            elif tok.tag == "/small":
+                self.size += 2
+            elif tok.tag == "big":
+                self.size += 4
+            elif tok.tag == "/big":
+                self.size -= 4
+                
         def text(self, tok):
             font = tkinter.font.Font(
-                size=16,
+                size=self.size,
                 weight=self.weight,
                 slant=self.style,
             )
@@ -98,9 +106,9 @@ class Browser:
 
     def load(self, url):
         headers, body = request(url)
-        text = lex(body)
+        tokens = lex(body)
         self.display_list = layout(text)
-        self.display_list.sort()    #NOT NEEDED;used here for smoother scrolling
+        self.display_list = Layout(tokens).display_list
         self.draw()
     
     def draw(self):
