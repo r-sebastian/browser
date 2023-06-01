@@ -62,7 +62,7 @@ class Layout:
                 self.size += 4
             elif tok.tag == "/big":
                 self.size -= 4
-                
+
         def text(self, tok):
             font = tkinter.font.Font(
                 size=self.size,
@@ -107,7 +107,6 @@ class Browser:
     def load(self, url):
         headers, body = request(url)
         tokens = lex(body)
-        self.display_list = layout(text)
         self.display_list = Layout(tokens).display_list
         self.draw()
     
@@ -123,7 +122,7 @@ class Browser:
                 continue
             #dispalying each char in list with correct positions
             #scroll value can now scroll the page as;y  is page coordinate therefore y-scroll is the screen coord
-            self.canvas.create_text(x, y - self.scroll , text=c, font = bi_times, anchor = 'nw')
+            self.canvas.create_text(x, y - self.scroll , text=c, font = self.bi_times, anchor = 'nw')
             '''
             loading information about the shape of a character, inside create_text, takes a while
             therefore slow scrolling
