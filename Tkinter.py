@@ -5,29 +5,62 @@ WIDTH , HEIGHT = 800 ,600   #resolution of the canvas
 HSTEP, VSTEP = 13, 18   #poniters to dispaly where the next charater is printed
 SCROLL_STEP = 100
 
+class Text:
+    def __init__(self, text):
+        self.text = text
+
+class Tag:
+    def __init__(self, tag):
+        self.tag = tag
+
 def lex(body):
+    out = []
     text = ""
-    in_angle = False
+    in_tag = False
     for c in body:
         if c == "<":
-            in_angle = True
+            in_tag = True
+            if text: out.append(Text(text))
+            text = ""
         elif c == ">":
-            in_angle = False
-        elif not in_angle:
+            in_tag = False
+            out.append(Tag(text))
+            text = ""
+        else:
             text += c
-    return text #returns the content of the page without tags
+    if not in_tag and text:
+        out.append(Text(text))
+    return out
 
-def layout(text):
+def layout(tokens):
+        weight = "normal"
+        style = "roman"
         #list for each char dispaly
         display_list = []   #list of things to display
         cursor_x, cursor_y = HSTEP, VSTEP
-        for word in text.split():
-            w = font.measure(word)  #measure width
-            if cursor_x + w > WIDTH - HSTEP:    #check is right end of word is past the page edge
-                cursor_y += font.metrics("linespace") * 1.25
-                cursor_x = HSTEP
+        for tok in tokens:
+            if isinstance(tok, Text):
+                font = tkinter.font.Font(
+                    size=16,
+                    weight=weight,
+                    slant=style,
+                )   
+                for word in tok.text.split():
+                    w = font.measure(word)  #measure width
+                    if cursor_x + w > WIDTH - HSTEP:    #check is right end of word is past the page edge
+                        cursor_y += font.metrics("linespace") * 1.25
+                        cursor_x = HSTEP
+                    display_list.append((cursor_x, cursor_y, word, font))
+            elif tok.tag == "i":
+                style = "italic"
+            elif tok.tag == "/i":
+                style = "roman"
+            elif tok.tag == "b":
+                weight = "bold"
+            elif tok.tag == "/b":
+                weight = "normal"
             self.display_list.append((cursor_x, cursor_y, word))  #drawing the word      
-            cursor_x += w + font.measure(" ")   #update the cursor to point to the end of the word
+            cursor_x += w + font.measure(" ")   #update the cursor to point to the end of the word; also adds whitespace
         '''
         icrement cursor_x by w + font.measure(" ") instead of w
         thats because I want to have spaces between the words
@@ -73,7 +106,7 @@ class Browser:
     def draw(self):
         self.canvas.delete("all")   #delets all the text everytime we call dra()-->for scrolling
         #loops thorugh diaply list
-        for x, y, c in self.display_list:\
+        for x, y, c in self.display_list:
             #bewlo 2 if are used to make scrolling faster
             #we only render stuff in our view
             if y > self.scroll + HEIGHT: 
