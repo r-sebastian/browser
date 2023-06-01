@@ -32,25 +32,20 @@ def lex(body):
         out.append(Text(text))
     return out
 
-def layout(tokens):
-        weight = "normal"
-        style = "roman"
-        #list for each char dispaly
-        display_list = []   #list of things to display
-        cursor_x, cursor_y = HSTEP, VSTEP
+class Layout:
+    def __init__(self, tokens):
+        self.display_list = []
+        self.cursor_x = HSTEP
+        self.cursor_y = VSTEP
+        self.weight = "normal"
+        self.style = "roman"
+        self.size = 16
         for tok in tokens:
+            self.token(tok)
+
+        def token(self, tok):
             if isinstance(tok, Text):
-                font = tkinter.font.Font(
-                    size=16,
-                    weight=weight,
-                    slant=style,
-                )   
-                for word in tok.text.split():
-                    w = font.measure(word)  #measure width
-                    if cursor_x + w > WIDTH - HSTEP:    #check is right end of word is past the page edge
-                        cursor_y += font.metrics("linespace") * 1.25
-                        cursor_x = HSTEP
-                    display_list.append((cursor_x, cursor_y, word, font))
+                self.text(tok)
             elif tok.tag == "i":
                 style = "italic"
             elif tok.tag == "/i":
@@ -59,15 +54,20 @@ def layout(tokens):
                 weight = "bold"
             elif tok.tag == "/b":
                 weight = "normal"
-            self.display_list.append((cursor_x, cursor_y, word))  #drawing the word      
-            cursor_x += w + font.measure(" ")   #update the cursor to point to the end of the word; also adds whitespace
-        '''
-        icrement cursor_x by w + font.measure(" ") instead of w
-        thats because I want to have spaces between the words
-        the call to split() removed all of the whitespace
-        and this adds it back
-        '''
-        return display_list
+
+        def text(self, tok):
+            font = tkinter.font.Font(
+                size=16,
+                weight=self.weight,
+                slant=self.style,
+            )
+            for word in tok.text.split():
+                w = font.measure(word)
+                if self.cursor_x + w > WIDTH - HSTEP:
+                    self.flush()
+                self.line.append((self.cursor_x, word, font))
+                self.cursor_x += w + font.measure(" ")
+
 
 class Browser:
     def __init__(self):
